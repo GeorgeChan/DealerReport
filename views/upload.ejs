@@ -1,0 +1,163 @@
+<% include head %>
+
+<div id="container" class="container">
+        <div class="row-fluid">
+            <div class="span3">
+                <!--Sidebar content-->
+                <div class="input-append date" id="dp1" data-date="<%= sDate %>" data-date-format="yyyy-mm-dd">
+                    <input id="dp2" type="text" class="input-medium" value="<%= sDate %>" readonly>
+                    <span class="add-on"><i class="icon-calendar"></i></span>
+                </div>
+
+                <ul id="selectable" >
+                    <% for(var i=0; i< clist.length; i++) { %>
+                    <li class="ui-widget-content" data-cid="<%= clist[i].cId %>"><%= clist[i].cFullName %> <%= clist[i].num %></li>
+                    <% } %>
+                </ul>
+            </div>
+            <div class="span7">
+                <span class="label label-info">说明:</span>
+                <div class="alert alert-info">
+                1. 选择日期，然后选择需要报数的代理商，后面的数字表示当日该经销商上报的型号数量；<br>
+                2. 下表中直接粘贴 Excel 日报格式：包括2行的标头、进销存数据、合计；<br>
+                3. 产品型号格式按照到货产品的型号全称，如:<span class="label label-success">S235HLBBD</span>或<span class="label label-success">S235HLBbd</span>或<span class="label label-success">S235HL Bbd</span>。不要使用简称缩写等形式；<br>
+                4. 进货、销售、库存中，如有未销售或未进货等情况，必须填写<span class="label label-success">0</span>，不得用空格代替；<br>
+                5. 测试通过后才可点击提交数据，如发现型号与产品库中型号不匹配则该型号不能成功录入系统，并在下方列表中提示。<br>
+                <span class="label label-important">重新提交某代理商某天的数据，会导致先清空该代理商当天已录入的所有数据，并替换为新提交的数据。</span><br>
+                </div>
+
+                <textarea  id= "inputStock" class="span12" rows="25" placeholder="点击此处直接粘贴Excel日报表内容，型号顺序可调整。" ></textarea>
+
+            </div>
+            <div class="span2">
+                <button class="btn btn-large btn-block btn-primary" onclick="checkstock()" type="button">测试库存数据</button>
+                <button class="btn btn-large btn-block btn-warning"  onclick="sendstock()" disabled type="button" id="sendbutton">提交库存数据</button>
+                <br>
+                <div id= "msg" class="alert alert-error"></div>
+            </div>
+
+        </div>
+</div>
+<script type="text/javascript">
+    Date.prototype.format = function(format) //author: meizz
+  {
+    var o = {
+      "M+" : this.getMonth()+1, //month
+      "d+" : this.getDate(),    //day
+      "h+" : this.getHours(),   //hour
+      "m+" : this.getMinutes(), //minute
+      "s+" : this.getSeconds(), //second
+      "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+      "S" : this.getMilliseconds() //millisecond
+    };
+    if(/(y+)/.test(format)) format=format.replace(RegExp.$1,
+      (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+    for(var k in o)if(new RegExp("("+ k +")").test(format))
+      format = format.replace(RegExp.$1,
+        RegExp.$1.length==1 ? o[k] :
+          ("00"+ o[k]).substr((""+ o[k]).length));
+    return format;
+  };
+
+    $(function(){
+        $("#dp1").datepicker();
+        $("#selectable").selectable();
+        $("#dp1").datepicker().on('changeDate', function(ev){
+            //alert(new Date(ev.date).format("yyyy-MM-dd"));
+            location.href = "/upload?sDate="+new Date(ev.date).format("yyyy-MM-dd");
+        });
+        });
+
+
+    function sendstock(){
+        var icid = $("#selectable .ui-selected").attr("data-cid");
+        var icname = $("#selectable .ui-selected").text();
+        var idate = $("#dp2").val();
+        if (!icid) return 1;
+        var Store = checkdata(1);
+        if (Store>0){
+            alert("error!!")
+        }else{
+            $.post("/jsonpost",
+                    {
+                        jsonact: 1,
+                        icid: icid,
+                        icname: icname,
+                        idate: idate,
+                        store: Store
+                    },
+                    function(data){
+                            $("#msg").html(data.state);
+                    }
+            );
+        }
+    }
+
+    function checkstock(){
+        switch (checkdata())
+        {
+        case 1:
+            alert("请先选择经销商！");
+            $("#sendbutton").attr({"disabled":"disabled"});
+            break;
+        case 2:
+            $("#sendbutton").attr({"disabled":"disabled"});
+            break;
+        case 0:
+            alert("检查通过！");
+            $("#sendbutton").attr({"disabled":false});
+            //$("#sendbutton").removeAttr("disabled");
+            break;
+        }
+    };
+
+    function checkdata(type){
+        // 返回结果 0 正常，1 未选择经销商，2 合计出错
+        var icid = $("#selectable .ui-selected").attr("data-cid");
+        var icname = $("#selectable .ui-selected").text();
+        if (!icid) return 1;
+        var stone = $("#inputStock").val().toUpperCase();//.replace(/ +(\D)/ig,'$1');
+        $("#inputStock").val(stone);
+        //var stockarray = stone.split(/\n/);
+        //var stockarray = stone.match(/(([A-z]{1,5}\d{3,4}[A-z]{0,12}).*\t(\d{0,4})\t(\d{0,4})\t(\d{0,4}\n))/gi);
+        var stockarray = stone.match(/([A-z]{1,5}\d{3,4}[A-z]{0,12}).*\t\d{0,4}\t\d{0,4}\t\d{0,4}\n/gi);
+        //var stockarray = stone.match(/[\w]*[\s\t]*(\w{1,5}\d{3,4}\w{0,12}).*\t(\d{0,4})\t(\d{0,4})\t(\d{0,4})\n|$2 $3 $4\n/gi);
+
+        var temp = stone.match(/\n[\s\t]*(\d*)[\s\t]+(\d*)[\s\t]+(\d*)|$2 $3 $1/gi);
+        var stocksum = temp[0].replace(/(^[\s\t]*)|(\s*$)/g, "").split(/[\t]+/);
+        var Store = new Array;
+        var x,line,id;
+        var s1 = s2 = s3 = 0;
+        for (x in stockarray){
+            var m = new Array(4);
+            var t = stockarray[x].match(/(\w{1,5}\d{3,4}\w{0,12}).*\t(\d{0,4})\t(\d{0,4})\t(\d{0,4})/i);
+            m[0] = t[1];
+            m[1] = (isNaN(parseInt(t[2]))?0:parseInt(t[2]));
+            m[2] = (isNaN(parseInt(t[3]))?0:parseInt(t[3]));
+            m[3] = (isNaN(parseInt(t[4]))?0:parseInt(t[4]));
+            Store.push(m);
+            s1 += m[1];
+            s2 += m[2];
+            s3 += m[3];
+        }
+        if ((s1==stocksum[0])&&(s2==stocksum[1])&&(s3==stocksum[2])){
+            if (!type){
+                return 0;
+            }else{
+                return Store;
+            }
+
+        }else{
+            if (!type){
+                alert("合计出错: "+s1+" "+s2+" "+s3);
+                return 2;
+            }else{
+                return 2;
+            }
+
+        }
+    }
+
+</script>
+
+<% include footer %>

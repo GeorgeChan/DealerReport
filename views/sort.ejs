@@ -1,0 +1,170 @@
+<% include head %>
+<div class="container">
+    <div class="well well-small">
+        <% if (act==1) { %>
+        <form class="form-horizontal"  action="/sort" method="get">
+            <div class="control-group">
+                <label class="control-label" for="cName">代理商简称</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="cName" name="cName" placeholder="代理商简称(2-3字符)">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="cFullName">代理商名称</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="cFullName" name="cFullName" placeholder="代理商名称">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="area">所在区域</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="area" name="area" placeholder="如：广州、番禺等">
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="hidden" name="act" value="1"/>
+                    <input type="hidden" name="jsonact" value="3"/>
+                    <button type="submit" class="btn btn btn-primary">添加新代理商</button>
+                </div>
+            </div>
+        </form>
+        <% } else if (act==2) {%>
+        <form class="form-horizontal"  action="/sort" method="get">
+            <div class="control-group">
+                <label class="control-label" for="pName">产品型号</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="pName" name="pName" placeholder="型号不要留空格">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="pFeature">产品特点</label>
+                <div class="controls">
+                    <input class="span3" type="text" id="pFeature" name="pFeature" placeholder="如：HDMI 丽镜屏">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="pSize">尺寸</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="pSize" name="pSize" placeholder="18.5 23 27">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="pLED">面板类型</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="pLED" name="pLED" value="LED" placeholder="LED LCD">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="pPanalType">面板类型</label>
+                <div class="controls">
+                    <input class="span2" type="text" id="pPanalType" name="pPanalType" placeholder="TN VA IPS">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <label class="radio">
+                        <input type="radio" name="optType" id="optionsRadios1" value="1" checked>实际产品
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="optType" id="optionsRadios2" value="2">产品别名
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="controls">
+                    <input type="hidden" name="act" value="2"/>
+                    <input type="hidden" name="jsonact" value="4"/>
+                    <button type="submit" class="btn btn btn-primary">添加新产品</button>
+                </div>
+            </div>
+
+        </form>
+        <% } %>
+    </div>
+    <span class="label label-info">说明:</span>
+    <div class="alert alert-info">
+        1. 用鼠标“拖拉”需要调整的项目，调整后按保存；<br>
+        2. 第一列为报表文件中需要显示的项目，拖拉排序；<br>
+        3. 第二列为暂时不显示的项目；<br>
+        4. 第三列已经停用不再统计的项目。<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="label label-important">第一列为显示顺序项目</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="label label-important">第二列为不显示项目</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="label label-important">第三列为禁用项目</span><br>
+    </div>
+</div>
+<div class="container">
+    <ul id="sortable1" class="droptrue">
+        <% for(var i=0; i< list1.length; i++) { %>
+        <li pId="<%= list1[i][0] %>" class="ui-state-default" style="cursor: pointer;"><%= list1[i][1] %></li>
+        <% } %>
+    </ul>
+
+    <ul id="sortable2" class="droptrue">
+        <% for(var i=0; i< list2.length; i++) { %>
+        <li pId="<%= list2[i][0] %>" class="ui-state-highlight" style="cursor: pointer;"><%= list2[i][1] %></li>
+        <% } %>
+    </ul>
+
+    <ul id="sortable3" class="droptrue">
+        <% for(var i=0; i< list3.length; i++) { %>
+        <li pId="<%= list3[i][0] %>" class="ui-state-error" style="cursor: pointer;"><%= list3[i][1] %></li>
+        <% } %>
+    </ul>
+
+    <br style="clear: both;" />
+</div>
+<div class="container">
+    <br>
+    <br>
+    <p>
+        <button class="btn btn-large btn-primary" onclick="save()" type="button">保 存</button>
+    </p>
+
+    <div id= "msg" class="alert alert-error"></div>
+
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $( "ul.droptrue" ).sortable({
+            connectWith: "ul"
+        });
+
+        $( "ul.dropfalse" ).sortable({
+            connectWith: "ul",
+            dropOnEmpty: false
+        });
+
+        $( "#sortable1, #sortable2, #sortable3" ).disableSelection();
+    });
+
+    function save(){
+        var list1=[],list2=[],list3=[];
+        $("#sortable1 li").each(function(i,obk){list1[list1.length]=$(this).attr("pId")});
+        $("#sortable2 li").each(function(i,obk){list2[list2.length]=$(this).attr("pId")});
+        $("#sortable3 li").each(function(i,obk){list3[list3.length]=$(this).attr("pId")});
+        $.post("/sort",
+                {
+                    jsonact: '<%= act %>',
+                    list1: list1,
+                    list2: list2,
+                    list3: list3
+                },
+                function(data){
+                    $("#msg").html(data.state);
+                }
+        );
+    }
+
+
+</script>
+
+<% include footer %>

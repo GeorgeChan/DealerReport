@@ -1,0 +1,29 @@
+<% include head %>
+<% if (!user) { %>
+<% include login %>
+<% } %>
+<div id="container" class="container">
+    <% if (!user) {%>
+    <div class="hero-unit">
+        <h1>
+            Market Analysis System
+        </h1>
+        <p>
+            Market Analysis System 是一个基于 Node.js 的市场分析软件。
+        </p>
+        <p>
+            <a class="btn btn-primary btn-large" data-toggle="modal" href="#login">
+                登录
+            </a>
+        </p>
+    </div>
+    <% } else {%>
+    <div class="hero-unit">
+        <h1>
+            Welcome <%= user %>
+        </h1>
+    </div>
+    <% } %>
+    <hr/>
+</div>
+<% include footer %>

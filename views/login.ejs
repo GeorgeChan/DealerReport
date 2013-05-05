@@ -1,0 +1,133 @@
+<!-- Modal -->
+<div id="login" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">登  录</h3>
+    </div>
+
+    <form method=post OnSubmit="return submitHandle()">
+        <div class="modal-body" style="width: 200px; margin: 0 auto;">
+            <br>
+            <p>请输入账号密码：</p>
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-user"></i></span>
+                <input class="input-medium" id="userInput" type="text" placeholder="账号">
+            </div>
+            <br>
+            <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                <input class="input-medium" id="passwordInput" type="password" placeholder="密码">
+            </div>
+            <div id="msg" class="text-error">&nbsp;</div>
+            <div class="controls"><input name="remUser" type="checkbox" value="" id="remUser"> 在本机记录用户名</div>
+            <br>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="visitordata('username')">登陆</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+        </div>
+    </form>
+
+</div>
+
+<script language="JavaScript">
+    function setCookie (name,value) {
+        document.cookie = name + "=" + value + "; path=/;expires=Thursday,01-Jan-2099 00:00:00 GMT";
+    }
+
+    function visitordata(name){
+        //alert($("#remUser").is(':checked'));
+        //alert($('input:checkbox:checked').val());
+        //alert($('#remUser:checked').val());
+        var remFlag = $("#remUser").is(':checked');
+        if(remFlag==true){
+            setCookie ("UserName",$("#userInput").val());
+            setCookie ("remUserCheck",true);
+        }else{
+            setCookie ("UserName","");
+            setCookie ("remUserCheck",false);
+        }
+        submitHandle();
+    }
+
+    function getCookie(name) {
+        var search;
+        search = name + "=";
+        offset = document.cookie.indexOf(search);
+        if (offset != -1) {
+            offset += search.length ;
+            end = document.cookie.indexOf(";", offset) ;
+            if (end == -1)
+                end = document.cookie.length;
+            return unescape(document.cookie.substring(offset, end));
+        }
+        else
+            return "";
+    }
+    function setUserName(){
+        $("#userInput").val(getCookie("UserName"));
+        //alert(getCookie("remUserCheck"));
+        //$("#remUser").val(getCookie("remUserCheck"));
+        if (getCookie("remUserCheck")=='true') {
+            $("#remUser").attr("checked", true);
+        }
+
+        if (getCookie("UserName")) {
+            if (getCookie("UserName")!="") {
+                $("passwordInput").focus();
+            }else{
+                $("#userInput").focus();
+            }
+        }else{
+            $("#userInput").focus();
+        }
+
+    }
+
+    function fTrim(str){
+        str=str.replace(/(^\s*)|(\s*$$)/g, "");
+        return str;
+    }
+
+
+    function submitHandle(){
+        var user = fTrim($("#userInput").val()); //.toLowerCase()
+        var passwd = $("#passwordInput").val();
+        var account="";
+        var domain="";
+
+        if(user==""){
+            $("#msg").html("请输入账号！");
+            $("#userInput").focus();
+            return false;
+        }
+        if (passwd == "") {
+            $("#msg").html("请输入密码！");
+            $("#passwordInput").focus();
+            return false;
+        }
+        $("#msg").html("<strong><font color='green'>验证中...</font></strong>");
+
+        $.post("/login",
+                {
+                    username:user,
+                    password:passwd
+                },
+                function(data){
+                    if(data.state===0) {
+                        window.location.reload();
+                    }else if(data.state===1){
+                        $("#msg").html("无此账号！");
+                    }else{
+                        $("#msg").html("密码错误！");
+                    }
+                });
+
+        return false;
+    }
+
+    $(function() {
+        setUserName();
+    });
+
+</script>

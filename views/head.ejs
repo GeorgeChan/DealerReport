@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Market Analysis <%=title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="/stylesheets/bootstrap.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/stylesheets/jquery-ui.min.css" rel="stylesheet">
+    <link href="/stylesheets/prettify.css" rel="stylesheet">
+    <link href="/stylesheets/datepicker.css" rel="stylesheet">
+    <link href="/stylesheets/DT_bootstrap.css" rel="stylesheet">
+
+
+
+
+    <style>
+        #feedback { font-size: 1.4em; }
+        #selectable .ui-selecting { background: #FECA40; }
+        #selectable .ui-selected { background: #F39814; color: white; }
+        #selectable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+        #selectable li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }
+
+        #sortable1, #sortable2, #sortable3 { list-style-type: none; margin: 0; padding: 0; float: left; margin-right: 10px; background: #ffffff; padding: 5px; border: 3px solid #0066cc; width: 200px;}
+        #sortable1 li, #sortable2 li, #sortable3 li { margin: 3px; padding: 3px; font-size: 1.4em; width: 186px; }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="/javascripts/html5shiv.js"></script>
+    <![endif]-->
+    <script src="/javascripts/jquery-1.9.1.min.js"></script>
+    <script src="/javascripts/jquery-ui.js"></script>
+    <script src="/javascripts/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/bootstrap-datepicker.js"></script>
+    <script src="/javascripts/modernizr.custom.00864.js"></script>
+
+
+
+</head>
+
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+<div class="navbar navber-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="./">市场分析系统</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active">
+                        <a href="/">首页</a>
+                    </li>
+                    <% if (!user) {%>
+                    <li class="">
+                        <a href="#login" data-toggle="modal">登录</a>
+                    </li>
+                    <% } else { %>
+                    <li class="">
+                        <a href="/upload">每日上传销售</a>
+                    </li>
+                    <li class="">
+                        <a href="/dreport?act=1">每日报表</a>
+                    </li>
+                    <li class="">
+                        <a href="/dreport?act=2">销售统计</a>
+                    </li>
+                    <li class="">
+                        <a href="/sort?act=1">代理商管理</a>
+                    </li>
+                    <li class="">
+                        <a href="/sort?act=2">产品管理</a>
+                    </li>
+                    <li class="">
+                        <a href="/alias">产品别名管理</a>
+                    </li>
+                    <li class="">
+                        <a href="/help">帮助</a>
+                    </li>
+                    <li class="">
+                        <a href="/logout">退出</a>
+                    </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

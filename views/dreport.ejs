@@ -1,0 +1,186 @@
+<% include head %>
+<% if (!user) { %>
+<% include login %>
+<% } %>
+<div align="center">
+
+<div class="input-append date" id="dp1" data-date="<%= sDate %>" data-date-format="yyyy-mm-dd">
+    <input id="dp2" type="text" class="input-medium" value="<%= sDate %>" readonly>
+    <span class="add-on"><i class="icon-calendar"></i></span>
+</div>
+<% if (act==2) {%>
+<div class="input-append date" id="dp3" data-date="<%= eDate %>" data-date-format="yyyy-mm-dd">
+    <input id="dp4" type="text" class="input-medium" value="<%= eDate %>" readonly>
+    <span class="add-on"><i class="icon-calendar"></i></span>
+</div>
+    
+<% } %>
+
+<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-hover table-bordered" id="supertable">
+    <thead>
+    <tr>
+        <th></th>
+        <th></th>
+        <% for (var i=0; i < cNameList.length; i++) { %>
+        <th></th>
+        <% } %>
+
+    </tr>
+    <tr>
+        <th>型号</th>
+        <th>合计</th>
+        <% for (var i=0; i < cNameList.length; i++) { %>
+        <th><%= cNameList[i].cName %></th>
+        <% } %>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+    <tr>
+        <th>型号</th>
+        <th>合计</th>
+        <% for (var i=0; i < cNameList.length; i++) { %>
+        <th><%= cNameList[i].cName %></th>
+        <% } %>
+    </tr>
+    </tfoot>
+
+</table>
+
+</div>
+<div id="container" class="container">
+    <br><br>
+    <span class="label label-info">说明:</span>
+    <div class="alert alert-info">
+        1. 默认每页只显示前50种显示器型号；<br>
+        2. 搜索栏可用空格分隔并列的搜索项目，如需要搜索S5系列可输入<span class="label label-success">S&nbsp;&nbsp;&nbsp;5</span>；<br>
+        3. 鼠标停留在表格中时，会提醒当前鼠标所指的型号提示。
+    </div>
+</div>
+
+<script>
+    Date.prototype.format = function(format) //author: meizz
+    {
+        var o = {
+            "M+" : this.getMonth()+1, //month
+            "d+" : this.getDate(),    //day
+            "h+" : this.getHours(),   //hour
+            "m+" : this.getMinutes(), //minute
+            "s+" : this.getSeconds(), //second
+            "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+            "S" : this.getMilliseconds() //millisecond
+        }
+        if(/(y+)/.test(format)) format=format.replace(RegExp.$1,
+                (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        for(var k in o)if(new RegExp("("+ k +")").test(format))
+            format = format.replace(RegExp.$1,
+                    RegExp.$1.length==1 ? o[k] :
+                            ("00"+ o[k]).substr((""+ o[k]).length));
+        return format;
+    };
+
+    $(document).ready(function () {
+        $("#selectable").selectable();
+
+        <% if (act==1) { %>
+        $("#dp1").datepicker();
+        $("#dp1").datepicker().on('changeDate', function(ev){
+            //alert(new Date(ev.date).format("yyyy-MM-dd"));
+            location.href = "/dreport?act=1&sDate="+new Date(ev.date).format("yyyy-MM-dd");
+        });
+        <% } %>
+
+        <% if (act==2) { %>
+        $("#dp1").datepicker();
+        $("#dp3").datepicker();
+        $("#dp3").datepicker().on('changeDate', function(ev){
+            //alert(new Date(ev.date).format("yyyy-MM-dd"));
+            location.href = "/dreport?act=2&sDate="+$("#dp2").val() +"&eDate="+new Date(ev.date).format("yyyy-MM-dd");
+        });
+        <% } %>
+
+
+        $('#supertable').dataTable({
+            "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+            "iDisplayLength": 50,
+            "bSort": false,
+            "oLanguage": {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "《上页",
+                    "sNext": "下页》",
+                    "sLast": "末页"
+                }
+            },
+            "fnFooterCallback": function ( nRow, aaData, iStart, iEnd, aiDisplay ) {
+                /* Calculate the market share for browsers on this page */
+                var total = 0;
+                for ( x in aaData){  //循环每一列
+                    var colSum = 0;
+                    if (x>1){  // 跳过前2列
+                        for ( var i=iStart ; i<iEnd ; i++ ){
+                            var numA = aaData[ aiDisplay[i] ][x]*1;
+                            colSum += (isNaN(numA)?0:numA)
+                        }
+                        total += colSum;
+                        $("tr:eq(0)").children().eq(x).html(colSum.toFixed(<%= setpoint %>));
+                        if (colSum>0){
+                            $("tr:eq(1)").children().eq(x).css("background","#ffc40d");
+                        }
+                        //$("tr:eq(0) td:nth-child(1)").html("AABBCC");
+                        //alert(colSum);
+                        //$('tr:eq(1) td:nth-child(2)').innerHTML = "AAA";
+                        //$('td:eq('+x+')', 1).html(Math.round(colSum*10000)/10000);
+                    }
+                }
+                $("tr:eq(0)").children().eq(1).html((total>0?total.toFixed(<%= setpoint %>):""));
+                /* Modify the footer row to match what we want */
+                //var nCells = nRow.getElementsByTagName('th');
+                //nCells[3].innerHTML = Math.round(num*10000)/10000;
+
+            },
+            //
+            "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+                /* Append the grade to the default row class name */
+                var rowSum = 0;
+                for (x in aData){
+                    if (x>1){
+                        var numA = aData[x]*1;
+                        rowSum += (isNaN(numA)?0:numA);
+                        $('td:eq('+ x +')', nRow).html((numA>0?numA.toFixed(<%= setpoint %>):""));
+
+                    }
+                }
+                $('td:eq(1)', nRow).html((rowSum>0?rowSum.toFixed(<%= setpoint %>):""));
+                $('td:eq(0)', nRow).css('text-align','left');
+                $('td:eq(0)', nRow).parent().prop('title',$('td:eq(0)', nRow).html());
+            },
+            "bProcessing": true,
+            <% if (act==1) { %>
+            "sAjaxSource": "/jsonpost?jsonact=2&act=1&sDate=<%= sDate %>"
+            <% } %>
+            <% if (act==2) { %>
+            "sAjaxSource": "/jsonpost?jsonact=3&act=2&sDate=<%= sDate %>&eDate=<%= eDate %>"
+            <% } %>
+            
+        });
+
+        $.extend( $.fn.dataTableExt.oStdClasses, {
+            "sSortAsc": "header headerSortDown",
+            "sSortDesc": "header headerSortUp",
+            "sSortable": "header"
+        } );
+
+    });
+</script>
+<% include footer %>

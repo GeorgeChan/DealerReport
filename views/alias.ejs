@@ -1,0 +1,77 @@
+<% include head %>
+<div class="container">
+        <span class="label label-info">说明:</span>
+        <div class="alert alert-info">
+            1. 第一列中灰色为真实统计的型号、红色型号为上一条灰色型号日报表上报时用到的别名；<br>
+            2. 第二列为暂时未对应上真实型号的产品别名；<br>
+            3. 将别名拖到第一列需要关联的型号下一项，调整后保存。<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="label label-important">第一列为真实统计型号</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="label label-important">第二列为未对应的别名型号</span>
+        </div>
+    </div>
+<div class="container">
+        <ul id="sortable1" class="droptrue">
+            <% for(var i=0; i< list1.length; i++) { %>
+                <li pId="<%= list1[i][0] %>" ppId="<%= list1[i][2] %>" class="ui-state-default ui-state-disabled" style="cursor: pointer;"><%= list1[i][1] %></li>
+                <% for(var j=0; j< list2.length; j++) { %>
+                    <% if (list1[i][0]===list2[j][2]) {%>
+                        <li pId="<%= list2[j][0] %>" ppId="<%= list2[j][2] %>" class="ui-state-default" style="cursor: pointer;"> -- <%= list2[j][1] %></li>
+                    <% } %>
+                <% } %>
+            <% } %>
+        </ul>
+
+        <ul id="sortable2" class="droptrue">
+            <% for(var i=0; i< list2.length; i++) { %>
+                <% if (list2[i][2]===-1) {%>
+                    <li pId="<%= list2[i][0] %>" ppId="-1" class="ui-state-error" style="cursor: pointer;"> -- <%= list2[i][1] %></li>
+                <% } %>
+            <% } %>
+        </ul>
+
+        <br style="clear: both;" />
+    </div>
+<div class="container">
+    <br>
+    <br>
+    <p>
+        <button class="btn btn-large btn-primary" onclick="save()" type="button">保 存</button>
+    </p>
+
+    <div id= "msg" class="alert alert-error"></div>
+
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $( "ul.droptrue" ).sortable({
+            connectWith: "ul",
+            cancel: ".ui-state-disabled"
+        });
+
+        $( "#sortable1, #sortable2" ).disableSelection();
+    });
+
+    function save(){
+        var list1=[],list2=[];
+        $("#sortable1 li").each(function(i,obk){list1[list1.length]=[];list1[list1.length-1][0]=$(this).attr("pId");list1[list1.length-1][1]=$(this).attr("ppId")});
+        $("#sortable2 li").each(function(i,obk){list2[list2.length]=[];list2[list2.length-1][0]=$(this).attr("pId");list2[list2.length-1][1]=-1});
+        $.post("/alias",
+                {
+                    jsonact: 1,
+                    list1: list1,
+                    list2: list2
+                },
+                function(data){
+                    $("#msg").html(data.state);
+                }
+        );
+    }
+
+
+</script>
+
+<% include footer %>
