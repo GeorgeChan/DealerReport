@@ -11,10 +11,10 @@ Powered by Node.js
 
 
 安装步骤：
-1. git clone https://github.com/GeorgeChan/DealerReport.git
-2. cd DealerReport
-3. 用 MySQL.sql 创建数据库
-4. 根据Mysql数据库的参数修改文件 settings.js
+1 git clone https://github.com/GeorgeChan/DealerReport.git
+2 cd DealerReport
+3 用 MySQL.sql 创建数据库
+4 根据Mysql数据库的参数修改文件 settings.js
 
 module.exports = {
   cookieSecret: 'georgechan',
@@ -25,9 +25,9 @@ module.exports = {
   setpoint: 4
 };
 
-5. npm install
-6. node app
-6. http://localhost:3000
+5  npm install
+6  node app
+6  http://localhost:3000
 
 默认登录：
 User: test1
