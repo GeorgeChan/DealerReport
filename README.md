@@ -25,7 +25,8 @@ module.exports = {
   setpoint: 4
 };
 
-5. node app
+5. npm install
+6. node app
 6. http://localhost:3000
 
 默认登录：
