@@ -1,4 +1,4 @@
-DealerReport
+#DealerReport
 ============
 
 Dealer report for everyday.
@@ -10,12 +10,17 @@ Powered by Node.js
 前端采用Twitter Bootstrap为框架，使用了jQuery、dataTables等工具库。
 
 
-安装步骤：
-1 git clone https://github.com/GeorgeChan/DealerReport.git
-2 cd DealerReport
+###安装步骤：
+
+1 `git clone https://github.com/GeorgeChan/DealerReport.git`
+
+2 `cd DealerReport`
+
 3 用 MySQL.sql 创建数据库
+
 4 根据Mysql数据库的参数修改文件 settings.js
 
+```javascript
 module.exports = {
   cookieSecret: 'georgechan',
   db: 'ma_erp',
@@ -24,11 +29,16 @@ module.exports = {
   dbpass: 'rootpassword',
   setpoint: 4
 };
+```
 
-5  npm install
-6  node app
-6  http://localhost:3000
+5  `npm install`
 
-默认登录：
+6  `node app`
+
+7  http://localhost:3000
+
+###默认登录：
+
 User: test1
+
 Pass: 1
