@@ -10,6 +10,11 @@ Powered by Node.js
 前端采用Twitter Bootstrap为框架，使用了jQuery、dataTables等工具库。
 
 
+###Demo：
+
+演示程序地址： [http://dealerreport.jit.su](http://dealerreport.jit.su)
+
+
 ###安装步骤：
 
 1 `git clone https://github.com/GeorgeChan/DealerReport.git`
